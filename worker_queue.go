@@ -18,6 +18,7 @@ type WorkerQueue struct {
 	workerIncrement int
 	cancelFuncs     []context.CancelFunc
 	mutex           sync.Mutex
+	wg              sync.WaitGroup
 	logger          *log.Logger
 }
 
@@ -56,11 +57,13 @@ func (wq *WorkerQueue) startWorkers() {
 	for i := 0; i < wq.workers; i++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wq.cancelFuncs = append(wq.cancelFuncs, cancel)
+		wg.Add(1)
 		go wq.worker(ctx)
 	}
 }
 
 func (wq *WorkerQueue) worker(ctx context.Context) {
+	defer wq.wg.Done()
 	for {
 		select {
 		case task, ok := <-wq.tasks:
@@ -121,6 +124,7 @@ func (wq *WorkerQueue) scaleUp() {
 	for i := 0; i < wq.workerIncrement && wq.workers < wq.maxWorkers; i++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wq.cancelFuncs = append(wq.cancelFuncs, cancel)
+		wq.wg.Add(1)
 		go wq.worker(ctx)
 		wq.workers++
 	}
@@ -141,4 +145,5 @@ func (wq *WorkerQueue) scaleDown() {
 
 func (wq *WorkerQueue) Shutdown() {
 	close(wq.tasks)
+	wq.wg.Wait()
 }
