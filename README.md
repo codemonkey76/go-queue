@@ -40,4 +40,4 @@ func main() {
 
 Copyright (c) 2015-present [Shane Poppleton](https://github.com/codemonkey76)
 
-Licensed under [MIT License](https://github.com/codemonkey76/go-queue/main/LICENSE)
+Licensed under [MIT License](https://raw.githubusercontent.com/codemonkey76/go-queue/main/LICENSE)
