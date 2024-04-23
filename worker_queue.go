@@ -54,6 +54,7 @@ func NewWorkerQueue(initialWorkers, maxWorkers, queueSize, workerIncrement int, 
 }
 
 func (wq *WorkerQueue) startWorkers() {
+	wq.logger.Printf("Starting %d workers\n", wq.workers)
 	for i := 0; i < wq.workers; i++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wq.cancelFuncs = append(wq.cancelFuncs, cancel)
@@ -121,7 +122,6 @@ func (wq *WorkerQueue) adjustWorkers() {
 func (wq *WorkerQueue) scaleUp() {
 	wq.mutex.Lock()
 	defer wq.mutex.Unlock()
-
 	for i := 0; i < wq.workerIncrement && wq.workers < wq.maxWorkers; i++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wq.cancelFuncs = append(wq.cancelFuncs, cancel)
@@ -129,6 +129,7 @@ func (wq *WorkerQueue) scaleUp() {
 		go wq.worker(ctx)
 		wq.workers++
 	}
+	wq.logger.Printf("Now running %d workers\n", wq.workers)
 }
 
 func (wq *WorkerQueue) scaleDown() {
@@ -142,6 +143,7 @@ func (wq *WorkerQueue) scaleDown() {
 		wq.cancelFuncs = wq.cancelFuncs[:len(wq.cancelFuncs)-1]
 		wq.workers--
 	}
+	wq.logger.Printf("Now running %d workers\n", wq.workers)
 }
 
 func (wq *WorkerQueue) Shutdown() {
