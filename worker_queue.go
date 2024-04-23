@@ -147,6 +147,8 @@ func (wq *WorkerQueue) scaleDown() {
 }
 
 func (wq *WorkerQueue) Shutdown() {
+	wq.logger.Println("Shutting down worker queue, waiting for tasks to complete")
 	close(wq.tasks)
 	wq.wg.Wait()
+	wq.logger.Println("Done")
 }
