@@ -57,7 +57,7 @@ func (wq *WorkerQueue) startWorkers() {
 	for i := 0; i < wq.workers; i++ {
 		ctx, cancel := context.WithCancel(context.Background())
 		wq.cancelFuncs = append(wq.cancelFuncs, cancel)
-		wg.Add(1)
+		wq.wg.Add(1)
 		go wq.worker(ctx)
 	}
 }
