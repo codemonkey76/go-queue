@@ -71,6 +71,7 @@ func (wq *WorkerQueue) worker(ctx context.Context) {
 				return
 			}
 			taskCtx, taskCancel := context.WithTimeout(ctx, task.Timeout())
+			wq.logger.Printf("Task %s started\n", task.ID())
 			err := task.Handle(taskCtx)
 			wq.logger.Printf("Task %s completed\n", task.ID())
 			taskCancel()
